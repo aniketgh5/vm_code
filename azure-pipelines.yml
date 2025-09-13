@@ -1,19 +1,39 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+trigger: none
+pool: mahakal_pool
+jobs:
+- job: build
+  displayName: buildinfra
+  steps:
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+  - task: TerraformTask@5
+    displayName: terraform init
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      backendServiceArm: '06September'
+      backendAzureRmStorageAccountName: 'mhanindia123'
+      backendAzureRmContainerName: 'mhanindia-container'
+      backendAzureRmKey: 'mhanindia.tfstate'
+  - task: TerraformTask@5
+    displayName: FMT
+    inputs:
+      provider: 'azurerm'
+      command: 'custom'
+      outputTo: 'console'
+      customCommand: 'fmt'
+      environmentServiceNameAzureRM: '06September'
+  - task: TerraformTask@5
+    displayName: PLAN
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      environmentServiceNameAzureRM: '06September'
+  - task: TerraformTask@5
+    displayName: Apply
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      commandOptions: '-auto-approve'
+      environmentServiceNameAzureRM: '06September'
