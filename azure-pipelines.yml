@@ -1,7 +1,4 @@
-# Trigger disabled
 trigger: none
-
-# Agent pool (ensure this pool exists in your Azure DevOps)
 pool: InfraVM
 
 jobs:
@@ -11,15 +8,15 @@ jobs:
     - task: TerraformInstaller@1
       displayName: Install Terraform
       inputs:
-        terraformVersion: '1.13.2' # use specific version for stability (or 'latest' if you prefer)
+        terraformVersion: '1.13.2' # ya 'latest' agar chaho
 
     - task: TerraformTask@5
       displayName: Terraform Init (build)
       inputs:
         provider: 'azurerm'
         command: 'init'
-        backendServiceArm: 'ServiceVM'                 # Service connection name in Azure DevOps
-        backendAzureRmOverrideSubscriptionID: 'b35c9afa-9045-49a7-852b-e7fbfe5ca332' # corrected ID
+        backendServiceArm: 'ServiceVM'
+        backendAzureRmOverrideSubscriptionID: 'b35c9afa-9045-49a7-852b-e7fbfe5ca332'
         backendAzureRmResourceGroupName: 'kolkata-resource'
         backendAzureRmStorageAccountName: 'kolkata7401'
         backendAzureRmContainerName: 'kolkata-container'
@@ -33,11 +30,13 @@ jobs:
 
 - job: Install
   displayName: Terraform Install
+  dependsOn: build
+  condition: succeeded('build')   # Install sirf tabhi chalega jab build succeed kare
   steps:
     - task: TerraformInstaller@1
       displayName: Install Terraform (install job)
       inputs:
-        terraformVersion: '1.13.2' # keep same version as build job
+        terraformVersion: '1.13.2'
 
     - task: TerraformTask@5
       displayName: Terraform Init (install)
