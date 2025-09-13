@@ -1,5 +1,5 @@
 trigger: none
-pool: mahakal_pool
+pool: InfraVM
 jobs:
 - job: build
   displayName: buildinfra
@@ -8,32 +8,24 @@ jobs:
     inputs:
       terraformVersion: 'latest'
   - task: TerraformTask@5
-    displayName: terraform init
     inputs:
       provider: 'azurerm'
       command: 'init'
-      backendServiceArm: '06September'
-      backendAzureRmStorageAccountName: 'mhanindia123'
-      backendAzureRmContainerName: 'mhanindia-container'
-      backendAzureRmKey: 'mhanindia.tfstate'
+      backendServiceArm: 'ServiceVM'
+      backendAzureRmOverrideSubscriptionID: 'b35c9afa-9045-49a7-852b-e7bffe5ca332'
+      backendAzureRmResourceGroupName: 'kolkata-resource'
+      backendAzureRmStorageAccountName: 'kolkata7401'
+      backendAzureRmContainerName: 'kolkata-container'
+      backendAzureRmKey: 'kolkata.tfstate'
   - task: TerraformTask@5
-    displayName: FMT
     inputs:
       provider: 'azurerm'
-      command: 'custom'
-      outputTo: 'console'
-      customCommand: 'fmt'
-      environmentServiceNameAzureRM: '06September'
+      command: 'validate'
+- job: apply
+  displayName: apply
+  steps: 
   - task: TerraformTask@5
-    displayName: PLAN
-    inputs:
-      provider: 'azurerm'
-      command: 'plan'
-      environmentServiceNameAzureRM: '06September'
-  - task: TerraformTask@5
-    displayName: Apply
     inputs:
       provider: 'azurerm'
       command: 'apply'
-      commandOptions: '-auto-approve'
-      environmentServiceNameAzureRM: '06September'
+      environmentServiceNameAzureRM: 'ServiceVM'
